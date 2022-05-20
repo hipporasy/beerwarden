@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'member.dart';
+part of 'event.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
@@ -18,27 +18,24 @@ class MemberAdapter extends TypeAdapter<Member> {
     };
     return Member(
       id: fields[1] as String,
-      firstName: fields[2] as String,
-      lastName: fields[3] as String,
-      dob: fields[4] as DateTime,
-      beerCrate: fields[5] as int,
+      date: fields[2] as DateTime,
+      title: fields[3] as String,
+      description: fields[4] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Member obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(4)
       ..writeByte(1)
       ..write(obj.id)
       ..writeByte(2)
-      ..write(obj.firstName)
+      ..write(obj.date)
       ..writeByte(3)
-      ..write(obj.lastName)
+      ..write(obj.title)
       ..writeByte(4)
-      ..write(obj.dob)
-      ..writeByte(5)
-      ..write(obj.beerCrate);
+      ..write(obj.description);
   }
 
   @override
