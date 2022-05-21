@@ -39,13 +39,13 @@ class MemberListScreen extends StatelessWidget {
   Widget _buildList() {
     return Obx(
       () => ListView.builder(
-        padding: EdgeInsets.zero,
+        padding: const EdgeInsets.symmetric(vertical: 10),
         itemCount: controller.members.length,
         itemBuilder: (context, index) {
           Member member = controller.members[index];
           return GestureDetector(
             onTap: () {
-              Get.to(() => ViewMemberScreen(member: member));
+              Get.to(() => ViewMemberScreen(memberId: member.id));
             },
             onLongPress: () {
               // controller.toggleMember(member);

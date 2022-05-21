@@ -14,21 +14,24 @@ class Events {
   String? description;
   @HiveField(5)
   String? winnerId;
+  @HiveField(6)
+  bool isConfirmed;
 
-  Events({
-    required this.id,
-    required this.date,
-    required this.title,
-    this.description,
-    this.winnerId,
-  });
+  Events(
+      {required this.id,
+      required this.date,
+      required this.title,
+      this.description,
+      this.winnerId,
+      this.isConfirmed = false});
 
   Events.fromJson(Map json)
       : id = json['id'],
         title = json['title'],
         date = json['date'],
         description = json['description'],
-        winnerId = json['winnerId'];
+        winnerId = json['winnerId'],
+        isConfirmed = json['isConfirmed'];
 
   toJson() {
     return {
@@ -37,6 +40,7 @@ class Events {
       'title': title,
       'description': description,
       'winnerId': winnerId,
+      'isConfirmed': isConfirmed,
     };
   }
 }

@@ -1,6 +1,7 @@
 import 'package:beerwarden/consts/app_color.dart';
 import 'package:beerwarden/controllers/event_controller.dart';
 import 'package:beerwarden/views/add_event_screen.dart';
+import 'package:beerwarden/views/view_event_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,10 @@ class UpcomingEventScreen extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
+          if (!controller.hasMember()) {
+            _showAlert(context);
+            return;
+          }
           controller.clearFields();
           Get.to(() => AddEventScreen());
         },
@@ -58,26 +63,76 @@ class UpcomingEventScreen extends StatelessWidget {
 
   Widget _buildHappeningEvent() {
     return Obx(
-      () => Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey[300]!,
-              blurRadius: 20,
-              spreadRadius: 1,
-            )
-          ],
-          color: controller.happeningEvent.value != null ? Colors.green : Colors.red,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-        padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-        child: controller.happeningEvent.value != null
-            ? _buildEvent(controller.happeningEvent.value!)
-            : _buildEmptyEvent(),
-      ),
+          () =>
+          Column(
+            children: [
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey[300]!,
+                      blurRadius: 20,
+                      spreadRadius: 1,
+                    )
+                  ],
+                  color: controller.happeningEvent.value != null
+                      ? Colors.green
+                      : Colors.red,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+                child: controller.happeningEvent.value != null
+                    ? _buildEvent(controller.happeningEvent.value!)
+                    : _buildEmptyEvent(),
+              ),
+              const SizedBox(height: 10),
+              _buildConfirmation(),
+            ],
+          ),
     );
+  }
+
+  Widget _buildConfirmation() {
+    return Obx(() {
+      if (controller.isConfirm.value == null) {
+        return Container();
+      }
+      if (controller.isConfirm.value!) {
+        return const Text("The Winner is Confirmed");
+      }
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const SizedBox(width: 20),
+          OutlinedButton(
+            onPressed: () {
+              controller.regenerateWinner();
+            },
+            style:
+            OutlinedButton.styleFrom(primary: AppColor.primary),
+            child: const Text(
+              'Random',
+              style: TextStyle(color: AppColor.primary, fontSize: 18),
+            ),
+          ),
+          const SizedBox(width: 20),
+          ElevatedButton(
+            onPressed: () {
+              controller.confirmWinner();
+            },
+            style:
+            ElevatedButton.styleFrom(primary: AppColor.primary),
+            child: const Text(
+              'Confirm',
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+          ),
+          const SizedBox(width: 20),
+        ],
+      );
+    });
   }
 
   Widget _buildEmptyEvent() {
@@ -129,10 +184,10 @@ class UpcomingEventScreen extends StatelessWidget {
         const SizedBox(
           height: 12,
         ),
-        const Text(
-          "Vann Heng",
+        Text(
+          controller.winnerName.value ?? "",
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -156,23 +211,30 @@ class UpcomingEventScreen extends StatelessWidget {
 
   Widget _buildList() {
     return Obx(
-      () => ListView.builder(
-        padding: EdgeInsets.zero,
-        itemCount: controller.upcomingEvents.length,
-        itemBuilder: (context, index) {
-          Events event = controller.upcomingEvents[index];
-          return GestureDetector(
-            onTap: () {
-              // Get.to(() => ViewEventScreen(member: member));
+          () =>
+          ListView.builder(
+            padding: EdgeInsets.zero,
+            itemCount: controller.upcomingEvents.length,
+            itemBuilder: (context, index) {
+              Events event = controller.upcomingEvents[index];
+              return GestureDetector(
+                onTap: () {
+                  Get.to(() => ViewEventScreen(event: event));
+                },
+                child: EventCard(event: event),
+              );
             },
-            onLongPress: () {
-              // controller.toggleEvent(member);
-            },
-            child: EventCard(event: event),
-          );
-        },
-      ),
+          ),
     );
+  }
+
+  void _showAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) =>
+        const AlertDialog(
+          content: Text("Please add member first!"),
+        ));
   }
 }
 

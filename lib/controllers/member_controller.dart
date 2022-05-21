@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -15,6 +17,10 @@ class MemberController extends GetxController {
   FocusNode lastNameFocus = FocusNode();
   FocusNode beerCrateFocus = FocusNode();
 
+  Member getMemberById(String id) {
+    return members.firstWhere((element) => element.id == id);
+  }
+
   @override
   onInit() {
     try {
@@ -24,6 +30,13 @@ class MemberController extends GetxController {
     }
     getMembers();
     super.onInit();
+  }
+
+  setInitialValue(Member member) {
+    firstNameController.text = member.firstName;
+    lastNameController.text = member.lastName;
+    beerCrateController.text = member.beerCrate.toString();
+    selectedDate.value = member.dob;
   }
 
   void selectDate() async {
@@ -39,6 +52,15 @@ class MemberController extends GetxController {
   }
 
   Future<bool> addMember(Member member) async {
+    members.add(member);
+    var box = await Hive.openBox('db');
+    box.put('members', members.toList());
+    print("To Do Object added $members");
+    return true;
+  }
+
+  Future<bool> updateMember(Member member) async {
+    members.removeWhere((element) => element.id == member.id);
     members.add(member);
     var box = await Hive.openBox('db');
     box.put('members', members.toList());
@@ -74,9 +96,23 @@ class MemberController extends GetxController {
     selectedDate = DateTime.now().obs;
   }
 
-  deleteMember(Member member) async {
-    members.remove(member);
+  deleteMember(String memberId) async {
+    members.remove(getMemberById(memberId));
     var box = await Hive.openBox('db');
     box.put('members', members.toList());
   }
+
+  String? getRandomMemberId() {
+    List<String> ids = [];
+    List<Member> currentMember = members.value.cast();
+    for (Member element in currentMember) {
+      var duplicatedIds = Iterable.generate(element.beerCrate).toList().map((e) => element.id);
+      ids.addAll(duplicatedIds);
+    }
+    ids.shuffle();
+    final random = Random();
+    var selectedId = ids[random.nextInt(ids.length)];
+    return selectedId;
+  }
+
 }

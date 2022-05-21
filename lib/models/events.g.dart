@@ -22,13 +22,14 @@ class EventsAdapter extends TypeAdapter<Events> {
       title: fields[3] as String,
       description: fields[4] as String?,
       winnerId: fields[5] as String?,
+      isConfirmed: fields[6] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Events obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(1)
       ..write(obj.id)
       ..writeByte(2)
@@ -38,7 +39,9 @@ class EventsAdapter extends TypeAdapter<Events> {
       ..writeByte(4)
       ..write(obj.description)
       ..writeByte(5)
-      ..write(obj.winnerId);
+      ..write(obj.winnerId)
+      ..writeByte(6)
+      ..write(obj.isConfirmed);
   }
 
   @override

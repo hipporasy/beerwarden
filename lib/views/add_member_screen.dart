@@ -7,8 +7,13 @@ import '../controllers/member_controller.dart';
 
 class MembersScreen extends StatelessWidget {
   final controller = Get.put(MemberController());
+  final Member? member;
 
-  MembersScreen({Key? key}) : super(key: key);
+  MembersScreen({this.member, Key? key}) : super(key: key) {
+    if (member != null) {
+      controller.setInitialValue(member!);
+    }
+  }
 
   void addMember(BuildContext context) async {
     if (controller.firstNameController.text.isEmpty ||
@@ -17,14 +22,31 @@ class MembersScreen extends StatelessWidget {
       _showAlert(context);
       return;
     }
-    var todo = Member(
+
+    if (member != null) {
+      var newMember = Member(
+        id: member!.id,
+        firstName: controller.firstNameController.text,
+        lastName: controller.lastNameController.text,
+        dob: controller.selectedDate.value,
+        beerCrate: int.parse(controller.beerCrateController.text),
+      );
+      var result = await controller.updateMember(newMember);
+      if (result) {
+        controller.clearFields();
+        Get.back();
+      }
+      return;
+    }
+
+    var newMember = Member(
       id: UniqueKey().toString(),
       firstName: controller.firstNameController.text,
       lastName: controller.lastNameController.text,
       dob: controller.selectedDate.value,
       beerCrate: int.parse(controller.beerCrateController.text),
     );
-    var result = await controller.addMember(todo);
+    var result = await controller.addMember(newMember);
     if (result) {
       controller.clearFields();
       Get.back();
@@ -123,8 +145,8 @@ class MembersScreen extends StatelessWidget {
           Align(
               alignment: Alignment.center,
               child: CustomButton(
-                title: "Add",
-                icon: Icons.add,
+                title: member == null ? "Add" : "Save",
+                icon: member == null ? Icons.add : Icons.edit,
                 onPressed: () {
                   addMember(context);
                 },
@@ -154,33 +176,25 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 180,
-      margin: const EdgeInsets.symmetric(horizontal: 30),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: height,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: color ?? Theme
-                    .of(context)
-                    .primaryColor,
-              ),
-              child: TextButton.icon(
-                onPressed: onPressed,
-                icon: Icon(
-                  icon,
-                  color: Colors.white,
-                ),
-                label: Text(
-                  title,
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
-                ),
-              ),
-            ),
-          ),
-        ],
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: color ?? Theme
+            .of(context)
+            .primaryColor,
+      ),
+      child: TextButton.icon(
+        onPressed: onPressed,
+        icon: Icon(
+          icon,
+          color: Colors.white,
+        ),
+        label: Text(
+          title,
+          style: const TextStyle(color: Colors.white, fontSize: 18),
+        ),
       ),
     );
   }
@@ -221,6 +235,8 @@ class CustomTextFormField extends StatelessWidget {
         borderRadius: borderRadius,
       ),
       child: TextFormField(
+        autocorrect: false,
+        enableSuggestions: false,
         keyboardType: textInputType,
         autofocus: true,
         focusNode: focus,
