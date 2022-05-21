@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/events.dart';
 import 'member_controller.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 class EventController extends GetxController {
   final _memberController = Get.put(MemberController());
-  var events = [].obs;
-  var upcomingEvents = [].obs;
   final happeningEvent = Rxn<Events>();
   final winnerName = Rxn<String>();
   final isConfirm = Rxn<bool>();
+
+  late SharedPreferences prefs;
+  var events = [].obs;
+  var upcomingEvents = [].obs;
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -23,13 +27,24 @@ class EventController extends GetxController {
   FocusNode descriptionFocus = FocusNode();
 
   @override
-  onInit() {
+  onInit() async {
     try {
       Hive.registerAdapter(EventsAdapter());
     } catch (e) {
       print(e);
     }
     getEvents();
+    var box = await Hive.openBox('db');
+    DateTime? lastUpdated = box.get("lastUpdated");
+    if (lastUpdated == null) {
+      await box.put("lastUpdated", DateTime.now());
+      await regenerateAllWinners();
+    } else {
+      if (!lastUpdated.isSameDate(DateTime.now())) {
+        await box.put("lastUpdated", DateTime.now());
+        await regenerateAllWinners();
+      }
+    }
     super.onInit();
   }
 
@@ -117,6 +132,9 @@ class EventController extends GetxController {
 
   regenerateAllWinners() async {
     for (Events element in events) {
+      if (element.isConfirmed) {
+        continue;
+      }
       element.winnerId = _memberController.getRandomMemberId();
     }
     var box = await Hive.openBox('db');

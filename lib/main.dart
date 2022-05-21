@@ -2,12 +2,16 @@ import 'package:beerwarden/consts/app_color.dart';
 import 'package:beerwarden/views/member_list_screen.dart';
 import 'package:beerwarden/views/upcoming_event_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
+import 'consts/notification_service.dart';
 
 
 Future<void> main() async {
   await Hive.initFlutter();
+  await NotificationService().init();
   runApp(const BeerWardenApp());
 }
 
