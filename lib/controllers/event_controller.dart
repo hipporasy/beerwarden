@@ -5,9 +5,9 @@ import 'package:intl/intl.dart';
 import '../models/events.dart';
 
 class EventController extends GetxController {
-  RxList<dynamic> events = [].obs;
-  RxList<dynamic> upcomingEvents = [].obs;
-  Rx<Events>? happeningEvent;
+  var events = [].obs;
+  var upcomingEvents = [].obs;
+  final happeningEvent = Rxn<Events>();
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -60,12 +60,15 @@ class EventController extends GetxController {
 
     List<Events>? values = box.get('events')?.cast<Events>();
     if (values != null) {
-      events.value = values;
-
-      for (var element in values) {
-        if (element.date.isSameDate(DateTime.now())) {
-          happeningEvent = element.obs;
-        }
+      events.value = [...values];
+      upcomingEvents.value = values;
+      var result = values.firstWhereOrNull(
+          (element) => element.date.isSameDate(DateTime.now()));
+      if (result != null) {
+        happeningEvent.value = result;
+        upcomingEvents.remove(result);
+      } else {
+        happeningEvent.value = null;
       }
     }
   }

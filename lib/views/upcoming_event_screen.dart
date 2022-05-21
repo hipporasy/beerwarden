@@ -68,13 +68,13 @@ class UpcomingEventScreen extends StatelessWidget {
               spreadRadius: 1,
             )
           ],
-          color: controller.happeningEvent != null ? Colors.green : Colors.red,
+          color: controller.happeningEvent.value != null ? Colors.green : Colors.red,
           borderRadius: BorderRadius.circular(8),
         ),
         margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
         padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-        child: controller.happeningEvent != null
-            ? _buildEvent(controller.happeningEvent!.value)
+        child: controller.happeningEvent.value != null
+            ? _buildEvent(controller.happeningEvent.value!)
             : _buildEmptyEvent(),
       ),
     );
@@ -142,7 +142,7 @@ class UpcomingEventScreen extends StatelessWidget {
           height: 8,
         ),
         const Text(
-          "Please Bring the Beer Crate to The Party...",
+          "Please bring the Beer Crate to the Party...",
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
@@ -158,9 +158,9 @@ class UpcomingEventScreen extends StatelessWidget {
     return Obx(
       () => ListView.builder(
         padding: EdgeInsets.zero,
-        itemCount: controller.events.length,
+        itemCount: controller.upcomingEvents.length,
         itemBuilder: (context, index) {
-          Events event = controller.events[index];
+          Events event = controller.upcomingEvents[index];
           return GestureDetector(
             onTap: () {
               // Get.to(() => ViewEventScreen(member: member));
