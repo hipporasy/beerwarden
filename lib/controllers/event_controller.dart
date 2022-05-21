@@ -88,6 +88,7 @@ class EventController extends GetxController {
     }
     e.isConfirmed = true;
     updateEvent(e);
+    _memberController.updateBeer(happeningEvent.value!.winnerId!);
   }
 
   Future<bool> updateEvent(Events event) async {

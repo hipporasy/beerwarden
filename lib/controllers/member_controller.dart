@@ -68,6 +68,15 @@ class MemberController extends GetxController {
     return true;
   }
 
+   updateBeer(String memberId) async {
+    Member? member = members.firstWhereOrNull((element) => element.id == memberId);
+    if (member == null) {
+      return;
+    }
+    member.beerCrate -= 1;
+    updateMember(member);
+  }
+
   Future getMembers() async {
     Box box;
     try {
