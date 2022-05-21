@@ -1,8 +1,8 @@
 import 'package:beerwarden/consts/app_color.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:beerwarden/views/view_member_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:intl/intl.dart';
 
 import '../controllers/member_controller.dart';
 import '../models/member.dart';
@@ -18,16 +18,11 @@ class MemberListScreen extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Navigator.of(context).push(MembersScreen())
+          controller.clearFields();
           Get.to(() => MembersScreen());
         },
-        label: Row(
-          children: const [
-            Icon(Icons.person_add),
-            SizedBox(width: 10),
-            Text("Add Member"),
-          ],
-        ),
+        backgroundColor: AppColor.primary,
+        label: const Icon(Icons.person_add),
       ),
       backgroundColor: Colors.grey[200],
       body: Column(
@@ -42,25 +37,27 @@ class MemberListScreen extends StatelessWidget {
   }
 
   Widget _buildList() {
-    return ListView.builder(
-      padding: EdgeInsets.zero,
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        // Member member = controller.members[index];
-        return GestureDetector(
-          onTap: () {
-            // Get.to(() => ViewMemberScreen(member: member));
-          },
-          onLongPress: () {
-            // controller.toggleMember(member);
-          },
-          child: MemberCard(
-            displayName: "Dy Sborng",
-            date: DateTime.now(),
-            beerCrate: 5,
-          ),
-        );
-      },
+    return Obx(
+      () => ListView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: controller.members.length,
+        itemBuilder: (context, index) {
+          Member member = controller.members[index];
+          return GestureDetector(
+            onTap: () {
+              Get.to(() => ViewMemberScreen(member: member));
+            },
+            onLongPress: () {
+              // controller.toggleMember(member);
+            },
+            child: MemberCard(
+              displayName: member.displayName,
+              date: member.dob,
+              beerCrate: member.beerCrate,
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -123,7 +120,7 @@ class MemberCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      timeago.format(date),
+                      DateFormat.yMMMd().format(date),
                       style: const TextStyle(
                         fontSize: 18,
                       ),

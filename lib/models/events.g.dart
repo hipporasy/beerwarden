@@ -1,33 +1,34 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'event.dart';
+part of 'events.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class MemberAdapter extends TypeAdapter<Member> {
+class EventsAdapter extends TypeAdapter<Events> {
   @override
-  final int typeId = 1;
+  final int typeId = 2;
 
   @override
-  Member read(BinaryReader reader) {
+  Events read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Member(
+    return Events(
       id: fields[1] as String,
       date: fields[2] as DateTime,
       title: fields[3] as String,
-      description: fields[4] as String,
+      description: fields[4] as String?,
+      winnerId: fields[5] as String?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Member obj) {
+  void write(BinaryWriter writer, Events obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(1)
       ..write(obj.id)
       ..writeByte(2)
@@ -35,7 +36,9 @@ class MemberAdapter extends TypeAdapter<Member> {
       ..writeByte(3)
       ..write(obj.title)
       ..writeByte(4)
-      ..write(obj.description);
+      ..write(obj.description)
+      ..writeByte(5)
+      ..write(obj.winnerId);
   }
 
   @override
@@ -44,7 +47,7 @@ class MemberAdapter extends TypeAdapter<Member> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MemberAdapter &&
+      other is EventsAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

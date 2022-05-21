@@ -1,26 +1,24 @@
-import 'package:beerwarden/models/member.dart';
+
+import 'package:beerwarden/controllers/event_controller.dart';
+import 'package:beerwarden/models/events.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../controllers/member_controller.dart';
+class AddEventScreen extends StatelessWidget {
+  final controller = Get.put(EventController());
 
-class MembersScreen extends StatelessWidget {
-  final controller = Get.put(MemberController());
-
-  MembersScreen({Key? key}) : super(key: key);
+  AddEventScreen({Key? key}) : super(key: key);
 
   void addMember() async {
-    if (controller.firstNameController.text.isEmpty ||
-        controller.lastNameController.text.isEmpty) return;
-    var todo = Member(
+    if (controller.titleController.text.isEmpty) return;
+    var event = Events(
       id: UniqueKey().toString(),
-      firstName: controller.firstNameController.text,
-      lastName: controller.lastNameController.text,
-      dob: controller.selectedDate.value,
-      beerCrate: int.parse(controller.beerCrateController.text),
+      title: controller.titleController.text,
+      description: controller.descriptionController.text,
+      date: controller.selectedDate.value,
     );
-    var result = await controller.addMember(todo);
+    var result = await controller.addEvent(event);
     if (result) {
       controller.clearFields();
       Get.back();
@@ -32,7 +30,7 @@ class MembersScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        title: const Text("Add Member"),
+        title: const Text("Add Event"),
         centerTitle: true,
         elevation: 0,
       ),
@@ -46,24 +44,6 @@ class MembersScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                CustomTextFormField(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  borderRadius: BorderRadius.circular(10),
-                  controller: controller.firstNameController,
-                  height: 50.0,
-                  hintText: "First Name",
-                  nextFocus: controller.lastNameFocus,
-                  textInputType: TextInputType.name,
-                ),
-                CustomTextFormField(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  focus: controller.lastNameFocus,
-                  borderRadius: BorderRadius.circular(10),
-                  controller: controller.lastNameController,
-                  height: 50.0,
-                  hintText: "Last Name",
-                  maxLines: 10,
-                ),
                 GestureDetector(
                   child: Container(
                     height: 48,
@@ -78,9 +58,9 @@ class MembersScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Select Date"),
+                        const Text("Event Date"),
                         Obx(
-                          () => Text(
+                              () => Text(
                             DateFormat.yMMMd()
                                 .format(controller.selectedDate.value),
                           ),
@@ -94,13 +74,21 @@ class MembersScreen extends StatelessWidget {
                 ),
                 CustomTextFormField(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
-                  focus: controller.beerCrateFocus,
                   borderRadius: BorderRadius.circular(10),
-                  controller: controller.beerCrateController,
+                  controller: controller.titleController,
                   height: 50.0,
-                  hintText: "Number of Beer Crate",
+                  hintText: "Event Name",
+                  nextFocus: controller.descriptionFocus,
+                  textInputType: TextInputType.name,
+                ),
+                CustomTextFormField(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  focus: controller.descriptionFocus,
+                  borderRadius: BorderRadius.circular(10),
+                  controller: controller.descriptionController,
+                  height: 120,
+                  hintText: "Description",
                   maxLines: 10,
-                  textInputType: TextInputType.number,
                 ),
               ],
             ),

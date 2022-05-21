@@ -1,8 +1,9 @@
 import 'package:hive/hive.dart';
-part 'event.g.dart';
 
-@HiveType(typeId: 1)
-class Member {
+part 'events.g.dart';
+
+@HiveType(typeId: 2)
+class Events {
   @HiveField(1)
   String id;
   @HiveField(2)
@@ -10,28 +11,32 @@ class Member {
   @HiveField(3)
   String title;
   @HiveField(4)
-  String description;
+  String? description;
+  @HiveField(5)
+  String? winnerId;
 
-
-  Member({
+  Events({
     required this.id,
     required this.date,
     required this.title,
-    required this.description,
+    this.description,
+    this.winnerId,
   });
 
-  Member.fromJson(Map json)
+  Events.fromJson(Map json)
       : id = json['id'],
         title = json['title'],
         date = json['date'],
-        description = json['description'];
+        description = json['description'],
+        winnerId = json['winnerId'];
 
   toJson() {
     return {
       'id': id,
+      'date': date,
       'title': title,
       'description': description,
-      'date': date,
+      'winnerId': winnerId,
     };
   }
 }

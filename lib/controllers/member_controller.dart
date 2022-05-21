@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-
 import '../models/member.dart';
 
 class MemberController extends GetxController {
@@ -10,11 +9,13 @@ class MemberController extends GetxController {
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController beerCrateController = TextEditingController();
+
   var selectedDate = DateTime.now().obs;
   FocusNode firstNameFocus = FocusNode();
   FocusNode lastNameFocus = FocusNode();
   FocusNode beerCrateFocus = FocusNode();
 
+  @override
   onInit() {
     try {
       Hive.registerAdapter(MemberAdapter());
@@ -29,22 +30,20 @@ class MemberController extends GetxController {
     final DateTime? pickedDate = await showDatePicker(
       context: Get.context!,
       initialDate: selectedDate.value,
-      firstDate: DateTime(2018),
-      lastDate: DateTime(2025),
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now(),
     );
     if (pickedDate != null && pickedDate != selectedDate.value) {
       selectedDate.value = pickedDate;
-      // textEditingController.text = DateFormat('DD-MM-
-      //     yyyy').format(selectedDate.value).toString();
-      // }
     }
   }
 
-  addMember(Member member) async {
+  Future<bool> addMember(Member member) async {
     members.add(member);
     var box = await Hive.openBox('db');
     box.put('members', members.toList());
     print("To Do Object added $members");
+    return true;
   }
 
   Future getMembers() async {
@@ -66,6 +65,13 @@ class MemberController extends GetxController {
       print(error);
     }
     members.value = [];
+  }
+
+  clearFields() {
+    firstNameController.text = "";
+    lastNameController.text = "";
+    beerCrateController.text = "0";
+    selectedDate = DateTime.now().obs;
   }
 
   deleteMember(Member member) async {

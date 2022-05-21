@@ -20,7 +20,7 @@ class BeerWardenApp extends StatefulWidget {
 
 class BeerWardenAppState extends State<BeerWardenApp> {
   static final List<Widget> _pages = <Widget>[
-    const UpcomingEventScreen(),
+    UpcomingEventScreen(),
     MemberListScreen()
   ];
 
