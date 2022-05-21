@@ -5,8 +5,9 @@ import 'package:intl/intl.dart';
 import '../models/events.dart';
 
 class EventController extends GetxController {
-  var events = [].obs;
-  Rx<Events?> happeningEvent = null.obs;
+  RxList<dynamic> events = [].obs;
+  RxList<dynamic> upcomingEvents = [].obs;
+  Rx<Events>? happeningEvent;
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -31,8 +32,8 @@ class EventController extends GetxController {
     final DateTime? pickedDate = await showDatePicker(
       context: Get.context!,
       initialDate: selectedDate.value,
-      firstDate: DateTime(1950),
-      lastDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (pickedDate != null && pickedDate != selectedDate.value) {
       selectedDate.value = pickedDate;
@@ -57,8 +58,16 @@ class EventController extends GetxController {
       box = await Hive.openBox('db');
     }
 
-    var tds = box.get('events');
-    if (tds != null) events.value = tds;
+    List<Events>? values = box.get('events')?.cast<Events>();
+    if (values != null) {
+      events.value = values;
+
+      for (var element in values) {
+        if (element.date.isSameDate(DateTime.now())) {
+          happeningEvent = element.obs;
+        }
+      }
+    }
   }
 
   clearEvents() {
@@ -82,5 +91,11 @@ class EventController extends GetxController {
     events.remove(event);
     var box = await Hive.openBox('db');
     box.put('events', events.toList());
+  }
+}
+
+extension DateOnlyCompare on DateTime {
+  bool isSameDate(DateTime other) {
+    return year == other.year && month == other.month && day == other.day;
   }
 }

@@ -10,9 +10,13 @@ class MembersScreen extends StatelessWidget {
 
   MembersScreen({Key? key}) : super(key: key);
 
-  void addMember() async {
+  void addMember(BuildContext context) async {
     if (controller.firstNameController.text.isEmpty ||
-        controller.lastNameController.text.isEmpty) return;
+        controller.lastNameController.text.isEmpty ||
+        controller.beerCrateController.text.isEmpty) {
+      _showAlert(context);
+      return;
+    }
     var todo = Member(
       id: UniqueKey().toString(),
       firstName: controller.firstNameController.text,
@@ -25,6 +29,15 @@ class MembersScreen extends StatelessWidget {
       controller.clearFields();
       Get.back();
     }
+  }
+
+  void _showAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) =>
+        const AlertDialog(
+          content: Text("Please check the fields"),
+        ));
   }
 
   @override
@@ -80,10 +93,11 @@ class MembersScreen extends StatelessWidget {
                       children: [
                         const Text("Select Date"),
                         Obx(
-                          () => Text(
-                            DateFormat.yMMMd()
-                                .format(controller.selectedDate.value),
-                          ),
+                              () =>
+                              Text(
+                                DateFormat.yMMMd()
+                                    .format(controller.selectedDate.value),
+                              ),
                         )
                       ],
                     ),
@@ -111,7 +125,9 @@ class MembersScreen extends StatelessWidget {
               child: CustomButton(
                 title: "Add",
                 icon: Icons.add,
-                onPressed: addMember,
+                onPressed: () {
+                  addMember(context);
+                },
               )),
           const SizedBox(height: 10),
         ],
@@ -147,7 +163,9 @@ class CustomButton extends StatelessWidget {
               height: height,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: color ?? Theme.of(context).primaryColor,
+                color: color ?? Theme
+                    .of(context)
+                    .primaryColor,
               ),
               child: TextButton.icon(
                 onPressed: onPressed,

@@ -57,26 +57,100 @@ class UpcomingEventScreen extends StatelessWidget {
   }
 
   Widget _buildHappeningEvent() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!,
-            blurRadius: 20,
-            spreadRadius: 1,
-          )
-        ],
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+    return Obx(
+      () => Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey[300]!,
+              blurRadius: 20,
+              spreadRadius: 1,
+            )
+          ],
+          color: controller.happeningEvent != null ? Colors.green : Colors.red,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+        padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+        child: controller.happeningEvent != null
+            ? _buildEvent(controller.happeningEvent!.value)
+            : _buildEmptyEvent(),
       ),
-      margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-      padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: const [Text("data")],
-      ),
+    );
+  }
+
+  Widget _buildEmptyEvent() {
+    return Column(
+      children: [
+        Image.asset(
+          "images/sad-face.png",
+          color: Colors.white,
+          width: 64,
+          height: 64,
+        ),
+        const SizedBox(
+          height: 12,
+        ),
+        const Text(
+          "No Event Today",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildEvent(Events event) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Image.asset(
+          "images/party.png",
+          color: Colors.white,
+          width: 64,
+          height: 64,
+        ),
+        const SizedBox(
+          height: 12,
+        ),
+        const Text(
+          "Let's get the party started",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(
+          height: 12,
+        ),
+        const Text(
+          "Vann Heng",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(
+          height: 8,
+        ),
+        const Text(
+          "Please Bring the Beer Crate to The Party...",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+        )
+      ],
     );
   }
 
@@ -114,7 +188,6 @@ class EventCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       margin: const EdgeInsets.fromLTRB(15, 5, 15, 5),
-      height: 80,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -127,11 +200,12 @@ class EventCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -144,13 +218,15 @@ class EventCard extends StatelessWidget {
                     Text(
                       event.title,
                       style: const TextStyle(
-                        fontSize: 18,
-                      ),
+                          fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
                 Text(
-                  event.description ?? "No Description",
+                  event.description?.isNotEmpty == true
+                      ? event.description!
+                      : "No Description",
                   style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 14,

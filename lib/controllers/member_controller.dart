@@ -70,7 +70,7 @@ class MemberController extends GetxController {
   clearFields() {
     firstNameController.text = "";
     lastNameController.text = "";
-    beerCrateController.text = "0";
+    beerCrateController.text = "";
     selectedDate = DateTime.now().obs;
   }
 
