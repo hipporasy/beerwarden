@@ -1,3 +1,4 @@
+import 'package:beerwarden/common/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -67,6 +68,9 @@ class EventController extends GetxController {
     events.add(event);
     var box = await Hive.openBox('db');
     box.put('events', events.toList());
+
+    NotificationService().showNotification((events.length - 1),
+        "The winner has been chosen", event.title, event.date);
     getEvents();
     return true;
   }
@@ -84,6 +88,7 @@ class EventController extends GetxController {
       events.value = [...values];
       upcomingEvents.value =
           allEvents.where((element) => !element.isConfirmed).toList();
+      upcomingEvents.sort((a, b) => b.date.compareTo(a.date));
       var result = values.firstWhereOrNull(
           (element) => (element.date.isSameDate(DateTime.now())));
       if (result != null) {
@@ -127,7 +132,12 @@ class EventController extends GetxController {
     events.remove(event);
     var box = await Hive.openBox('db');
     box.put('events', events.toList());
-    getEvents();
+    await getEvents();
+    NotificationService().flutterLocalNotificationsPlugin.cancelAll();
+    for (Events element in upcomingEvents) {
+      NotificationService().showNotification((upcomingEvents.length - 1),
+          "The winner has been chosen", element.title, element.date);
+    }
   }
 
   regenerateAllWinners() async {

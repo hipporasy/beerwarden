@@ -68,8 +68,9 @@ class MemberController extends GetxController {
     return true;
   }
 
-   updateBeer(String memberId) async {
-    Member? member = members.firstWhereOrNull((element) => element.id == memberId);
+  updateBeer(String memberId) async {
+    Member? member =
+        members.firstWhereOrNull((element) => element.id == memberId);
     if (member == null) {
       return;
     }
@@ -114,8 +115,13 @@ class MemberController extends GetxController {
   String? getRandomMemberId() {
     List<String> ids = [];
     List<Member> currentMember = members.value.cast();
+    int number = currentMember.map((e) => e.beerCrate).reduce(min);
     for (Member element in currentMember) {
-      var duplicatedIds = Iterable.generate(element.beerCrate).toList().map((e) => element.id);
+      var crateNumber = element.beerCrate > number
+          ? element.beerCrate - number
+          : element.beerCrate;
+      var duplicatedIds =
+          Iterable.generate(crateNumber).toList().map((e) => element.id);
       ids.addAll(duplicatedIds);
     }
     ids.shuffle();
@@ -123,5 +129,4 @@ class MemberController extends GetxController {
     var selectedId = ids[random.nextInt(ids.length)];
     return selectedId;
   }
-
 }

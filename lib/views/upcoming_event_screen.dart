@@ -64,7 +64,7 @@ class UpcomingEventScreen extends StatelessWidget {
   Widget _buildHappeningEvent() {
     return Obx(
       () => GestureDetector(
-        onTap: () => Get.to(ViewEventScreen(event: controller.happeningEvent.value!)),
+        onTap: () => Get.to(() => ViewEventScreen(event: controller.happeningEvent.value!)),
         child: Column(
           children: [
             Container(

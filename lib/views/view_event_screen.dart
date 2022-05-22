@@ -79,14 +79,19 @@ class ViewEventScreen extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            Text(
-              event.description ?? "No Description",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-                fontSize: 15,
+            Flexible(
+              child: Text(
+                event.description ?? "No Description",
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 15,
+                ),
               ),
-            )
+            ),
           ],
         ),
         const SizedBox(height: 8),

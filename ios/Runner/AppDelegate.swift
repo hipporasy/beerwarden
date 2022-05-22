@@ -15,5 +15,14 @@ import Flutter
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
+}
+
+
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.banner, .alert, .sound])
+    }
     
 }

@@ -6,7 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'consts/notification_service.dart';
+import 'common/notification_service.dart';
 
 
 Future<void> main() async {
