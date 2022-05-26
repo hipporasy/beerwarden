@@ -23,13 +23,15 @@ class EventsAdapter extends TypeAdapter<Events> {
       description: fields[4] as String?,
       winnerId: fields[5] as String?,
       isConfirmed: fields[6] as bool,
+      recurrence: fields[7] as int?,
+      occurences: (fields[8] as List?)?.cast<DateTime>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Events obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(8)
       ..writeByte(1)
       ..write(obj.id)
       ..writeByte(2)
@@ -41,7 +43,11 @@ class EventsAdapter extends TypeAdapter<Events> {
       ..writeByte(5)
       ..write(obj.winnerId)
       ..writeByte(6)
-      ..write(obj.isConfirmed);
+      ..write(obj.isConfirmed)
+      ..writeByte(7)
+      ..write(obj.recurrence)
+      ..writeByte(8)
+      ..write(obj.occurences);
   }
 
   @override

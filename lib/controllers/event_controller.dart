@@ -13,6 +13,7 @@ class EventController extends GetxController {
   final happeningEvent = Rxn<Events>();
   final winnerName = Rxn<String>();
   final isConfirm = Rxn<bool>();
+  final recurrenceTypeValue = 1.obs;
 
   late SharedPreferences prefs;
   var events = [].obs;

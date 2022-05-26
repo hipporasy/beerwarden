@@ -1,3 +1,4 @@
+import 'package:beerwarden/consts/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -122,7 +123,17 @@ class ViewMemberScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          var member = controller.getMemberById(memberId);
+          member.beerCrate += 1;
+          controller.updateMember(member);
+        },
+        backgroundColor: AppColor.primary,
+        label: const Icon(Icons.add),
+      ),
       appBar: AppBar(
+
         title: const Text(
           "Member Detail",
         ),

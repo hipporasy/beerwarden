@@ -2,6 +2,13 @@ import 'package:hive/hive.dart';
 
 part 'events.g.dart';
 
+class RecurranceType {
+  static const daily = "DAILY";
+  static const weekly = "WEEKLY";
+  static const monthly = "MONTHLY";
+  static const yearly = "YEARLY";
+}
+
 @HiveType(typeId: 2)
 class Events {
   @HiveField(1)
@@ -16,6 +23,10 @@ class Events {
   String? winnerId;
   @HiveField(6)
   bool isConfirmed;
+  @HiveField(7)
+  String? recurrence;
+  @HiveField(8)
+  List<DateTime>? occurences;
 
   Events(
       {required this.id,
@@ -23,7 +34,9 @@ class Events {
       required this.title,
       this.description,
       this.winnerId,
-      this.isConfirmed = false});
+      this.isConfirmed = false,
+      this.recurrence,
+      this.occurences});
 
   Events.fromJson(Map json)
       : id = json['id'],
@@ -31,7 +44,9 @@ class Events {
         date = json['date'],
         description = json['description'],
         winnerId = json['winnerId'],
-        isConfirmed = json['isConfirmed'];
+        isConfirmed = json['isConfirmed'],
+        recurrence = json['recurrence'],
+        occurences = json['occurences'];
 
   toJson() {
     return {
@@ -41,6 +56,8 @@ class Events {
       'description': description,
       'winnerId': winnerId,
       'isConfirmed': isConfirmed,
+      'recurrence': recurrence,
+      'occurences': occurences,
     };
   }
 }

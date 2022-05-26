@@ -1,4 +1,3 @@
-
 import 'package:beerwarden/controllers/event_controller.dart';
 import 'package:beerwarden/models/events.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +27,7 @@ class AddEventScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: const Text("Add Event"),
@@ -60,7 +60,7 @@ class AddEventScreen extends StatelessWidget {
                       children: [
                         const Text("Event Date"),
                         Obx(
-                              () => Text(
+                          () => Text(
                             DateFormat.yMMMd()
                                 .format(controller.selectedDate.value),
                           ),
@@ -71,6 +71,12 @@ class AddEventScreen extends StatelessWidget {
                   onTap: () {
                     controller.selectDate();
                   },
+                ),
+                DropdownButton(
+                    value: controller.recurrenceTypeValue,
+                    style: TextStyle(color: Colors.red,fontSize: 30),
+                    onChanged: null,
+                    items: dropdownItems
                 ),
                 CustomTextFormField(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -105,6 +111,16 @@ class AddEventScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<DropdownMenuItem<String>> get dropdownItems {
+    List<DropdownMenuItem<String>> menuItems = [
+      DropdownMenuItem(value: RecurranceType.daily.toString(), child: const Text("Daily")),
+      DropdownMenuItem(value: RecurranceType.weekly.toString(), child: const Text("Weekly")),
+      DropdownMenuItem(value: RecurranceType.monthly.toString(), child: const Text("Monthly")),
+      DropdownMenuItem(value: RecurranceType.yearly.toString(), child: const Text("Yearly")),
+    ];
+    return menuItems;
   }
 }
 
