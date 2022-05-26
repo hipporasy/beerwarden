@@ -26,7 +26,7 @@ class Events {
   @HiveField(7)
   String? recurrence;
   @HiveField(8)
-  List<DateTime>? occurences;
+  List<DateTime>? occurrences;
 
   Events(
       {required this.id,
@@ -36,7 +36,7 @@ class Events {
       this.winnerId,
       this.isConfirmed = false,
       this.recurrence,
-      this.occurences});
+      this.occurrences});
 
   Events.fromJson(Map json)
       : id = json['id'],
@@ -46,7 +46,7 @@ class Events {
         winnerId = json['winnerId'],
         isConfirmed = json['isConfirmed'],
         recurrence = json['recurrence'],
-        occurences = json['occurences'];
+        occurrences = json['occurrences'];
 
   toJson() {
     return {
@@ -57,7 +57,7 @@ class Events {
       'winnerId': winnerId,
       'isConfirmed': isConfirmed,
       'recurrence': recurrence,
-      'occurences': occurences,
+      'occurrences': occurrences,
     };
   }
 }

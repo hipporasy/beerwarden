@@ -1,3 +1,4 @@
+import 'package:beerwarden/consts/app_color.dart';
 import 'package:beerwarden/controllers/event_controller.dart';
 import 'package:beerwarden/models/events.dart';
 import 'package:flutter/material.dart';
@@ -74,10 +75,12 @@ class AddEventScreen extends StatelessWidget {
                 ),
                 DropdownButton(
                     value: controller.recurrenceTypeValue,
-                    style: TextStyle(color: Colors.red,fontSize: 30),
-                    onChanged: null,
-                    items: dropdownItems
-                ),
+                    style:
+                        const TextStyle(color: AppColor.primary, fontSize: 18),
+                    onChanged: (value) {
+                      controller.recurrenceTypeValue.value = value;
+                    },
+                    items: dropdownItems),
                 CustomTextFormField(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   borderRadius: BorderRadius.circular(10),
@@ -115,10 +118,15 @@ class AddEventScreen extends StatelessWidget {
 
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
-      DropdownMenuItem(value: RecurranceType.daily.toString(), child: const Text("Daily")),
-      DropdownMenuItem(value: RecurranceType.weekly.toString(), child: const Text("Weekly")),
-      DropdownMenuItem(value: RecurranceType.monthly.toString(), child: const Text("Monthly")),
-      DropdownMenuItem(value: RecurranceType.yearly.toString(), child: const Text("Yearly")),
+      DropdownMenuItem(
+          value: RecurranceType.daily.toString(), child: const Text("Daily")),
+      DropdownMenuItem(
+          value: RecurranceType.weekly.toString(), child: const Text("Weekly")),
+      DropdownMenuItem(
+          value: RecurranceType.monthly.toString(),
+          child: const Text("Monthly")),
+      DropdownMenuItem(
+          value: RecurranceType.yearly.toString(), child: const Text("Yearly")),
     ];
     return menuItems;
   }

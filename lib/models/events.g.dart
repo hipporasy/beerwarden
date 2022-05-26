@@ -23,8 +23,8 @@ class EventsAdapter extends TypeAdapter<Events> {
       description: fields[4] as String?,
       winnerId: fields[5] as String?,
       isConfirmed: fields[6] as bool,
-      recurrence: fields[7] as int?,
-      occurences: (fields[8] as List?)?.cast<DateTime>(),
+      recurrence: fields[7] as String?,
+      occurrences: (fields[8] as List?)?.cast<DateTime>(),
     );
   }
 
@@ -47,7 +47,7 @@ class EventsAdapter extends TypeAdapter<Events> {
       ..writeByte(7)
       ..write(obj.recurrence)
       ..writeByte(8)
-      ..write(obj.occurences);
+      ..write(obj.occurrences);
   }
 
   @override
