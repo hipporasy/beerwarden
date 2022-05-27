@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:beerwarden/consts/app_color.dart';
 import 'package:beerwarden/views/member_list_screen.dart';
 import 'package:beerwarden/views/upcoming_event_screen.dart';
@@ -12,6 +15,9 @@ import 'common/notification_service.dart';
 Future<void> main() async {
   await Hive.initFlutter();
   await NotificationService().init();
+  if (Platform.isAndroid) {
+    await AndroidAlarmManager.initialize();
+  }
   runApp(const BeerWardenApp());
 }
 

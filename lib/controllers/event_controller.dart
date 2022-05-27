@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:beerwarden/common/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,7 +15,7 @@ class EventController extends GetxController {
   final happeningEvent = Rxn<Events>();
   final winnerName = Rxn<String>();
   final isConfirm = Rxn<bool>();
-  final recurrenceTypeValue = 1.obs;
+  final recurrenceTypeValue = "NONE".obs;
 
   late SharedPreferences prefs;
   var events = [].obs;
@@ -35,7 +37,7 @@ class EventController extends GetxController {
     } catch (e) {
       print(e);
     }
-    getEvents();
+    await getEvents();
     var box = await Hive.openBox('db');
     DateTime? lastUpdated = box.get("lastUpdated");
     if (lastUpdated == null) {
@@ -108,6 +110,7 @@ class EventController extends GetxController {
       return;
     }
     e.isConfirmed = true;
+    e.occurrences = [e.date];
     updateEvent(e);
     _memberController.updateBeer(happeningEvent.value!.winnerId!);
   }
@@ -142,6 +145,10 @@ class EventController extends GetxController {
   }
 
   regenerateAllWinners() async {
+    if (Platform.isIOS) {
+      await occurrenceIfNeeded();
+      await recurrenceIfNeeded();
+    }
     for (Events element in events) {
       if (element.isConfirmed) {
         continue;
@@ -176,6 +183,56 @@ class EventController extends GetxController {
 
   bool hasMember() {
     return _memberController.members.value.isNotEmpty;
+  }
+
+  occurrenceIfNeeded() async {
+    var e = happeningEvent.value;
+    if (e == null) {
+      return;
+    }
+    e.isConfirmed = true;
+    e.occurrences = [e.date];
+    updateEvent(e);
+  }
+
+  recurrenceIfNeeded() async {
+    for (Events element in events) {
+      if (element.isConfirmed && element.recurrence == null) {
+        continue;
+      }
+      // Reschedule Recurring Events
+      if (element.date.isBefore(DateTime.now()) &&
+          !element.date.isSameDate(DateTime.now())) {
+        DateTime lastOccurrence = element.occurrences?.last ?? DateTime.now();
+        element.isConfirmed = false;
+        switch (element.recurrence) {
+          case RecurranceType.daily:
+            element.date = element.date.add(const Duration(days: 1));
+            break;
+          case RecurranceType.weekly:
+            element.date = DateTime(lastOccurrence.year, lastOccurrence.month,
+                lastOccurrence.day + 7);
+            break;
+          case RecurranceType.monthly:
+            element.date = DateTime(lastOccurrence.year,
+                lastOccurrence.month + 1, lastOccurrence.day);
+            break;
+          case RecurranceType.yearly:
+            element.date = DateTime(lastOccurrence.year + 1,
+                lastOccurrence.month, lastOccurrence.day);
+            break;
+        }
+      }
+      element.winnerId = _memberController.getRandomMemberId();
+    }
+    var box = await Hive.openBox('db');
+    box.put('events', events.toList());
+    await getEvents();
+    NotificationService().flutterLocalNotificationsPlugin.cancelAll();
+    for (Events element in upcomingEvents) {
+      NotificationService().showNotification((upcomingEvents.length - 1),
+          "The winner has been chosen", element.title, element.date);
+    }
   }
 }
 

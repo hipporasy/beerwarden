@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:beerwarden/common/alarm_scheduler.dart';
 import 'package:beerwarden/consts/app_color.dart';
 import 'package:beerwarden/controllers/event_controller.dart';
 import 'package:beerwarden/views/add_event_screen.dart';
@@ -11,7 +14,13 @@ import '../models/events.dart';
 class UpcomingEventScreen extends StatelessWidget {
   final controller = Get.put(EventController());
 
-  UpcomingEventScreen({Key? key}) : super(key: key);
+  UpcomingEventScreen({Key? key}) : super(key: key) {
+    if (Platform.isAndroid) {
+      AlarmScheduler().eventController = controller;
+      AlarmScheduler().onAlarm();
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,36 +72,45 @@ class UpcomingEventScreen extends StatelessWidget {
 
   Widget _buildHappeningEvent() {
     return Obx(
-      () => GestureDetector(
-        onTap: () => Get.to(() => ViewEventScreen(event: controller.happeningEvent.value!)),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey[300]!,
-                    blurRadius: 20,
-                    spreadRadius: 1,
-                  )
-                ],
-                color: controller.happeningEvent.value != null
-                    ? Colors.green
-                    : Colors.red,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-              padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-              child: controller.happeningEvent.value != null
-                  ? _buildEvent(controller.happeningEvent.value!)
-                  : _buildEmptyEvent(),
+          () =>
+          GestureDetector(
+            onTap: () =>
+            {
+              if (controller.happeningEvent.value != null)
+                Get.to(
+                        () =>
+                        ViewEventScreen(
+                            event: controller.happeningEvent.value!))
+            },
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey[300]!,
+                        blurRadius: 20,
+                        spreadRadius: 1,
+                      )
+                    ],
+                    color: controller.happeningEvent.value != null
+                        ? Colors.green
+                        : Colors.red,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  margin: const EdgeInsets.symmetric(
+                      vertical: 0, horizontal: 16),
+                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+                  child: controller.happeningEvent.value != null
+                      ? _buildEvent(controller.happeningEvent.value!)
+                      : _buildEmptyEvent(),
+                ),
+                const SizedBox(height: 10),
+                _buildConfirmation(),
+              ],
             ),
-            const SizedBox(height: 10),
-            _buildConfirmation(),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -211,28 +229,30 @@ class UpcomingEventScreen extends StatelessWidget {
 
   Widget _buildList() {
     return Obx(
-      () => ListView.builder(
-        padding: EdgeInsets.zero,
-        itemCount: controller.upcomingEvents.length,
-        itemBuilder: (context, index) {
-          Events event = controller.upcomingEvents[index];
-          return GestureDetector(
-            onTap: () {
-              Get.to(() => ViewEventScreen(event: event));
+          () =>
+          ListView.builder(
+            padding: EdgeInsets.zero,
+            itemCount: controller.upcomingEvents.length,
+            itemBuilder: (context, index) {
+              Events event = controller.upcomingEvents[index];
+              return GestureDetector(
+                onTap: () {
+                  Get.to(() => ViewEventScreen(event: event));
+                },
+                child: EventCard(event: event),
+              );
             },
-            child: EventCard(event: event),
-          );
-        },
-      ),
+          ),
     );
   }
 
   void _showAlert(BuildContext context) {
     showDialog(
         context: context,
-        builder: (context) => const AlertDialog(
-              content: Text("Please add member first!"),
-            ));
+        builder: (context) =>
+        const AlertDialog(
+          content: Text("Please add member first!"),
+        ));
   }
 }
 

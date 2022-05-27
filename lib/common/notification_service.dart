@@ -38,16 +38,14 @@ class NotificationService {
   Future<void> showNotification(
       int id, String title, String body, DateTime scheduleDate) async {
     var date = tz.TZDateTime.from(
-        scheduleDate
-          ..subtract(
-              Duration(hours: scheduleDate.hour, minutes: scheduleDate.minute))
-          ..add(const Duration(hours: 8, minutes: 30)),
+        DateTime(
+            scheduleDate.year, scheduleDate.month, scheduleDate.day - 1, 8, 30),
         tz.local);
     await flutterLocalNotificationsPlugin.zonedSchedule(
       id,
       title,
       body,
-      date, //schedule the notification to show after 2 seconds.
+      date,
       const NotificationDetails(
         // Android details
         android: AndroidNotificationDetails('main_channel', 'Main Channel',

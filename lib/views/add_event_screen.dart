@@ -13,11 +13,13 @@ class AddEventScreen extends StatelessWidget {
   void addMember() async {
     if (controller.titleController.text.isEmpty) return;
     var event = Events(
-      id: UniqueKey().toString(),
-      title: controller.titleController.text,
-      description: controller.descriptionController.text,
-      date: controller.selectedDate.value,
-    );
+        id: UniqueKey().toString(),
+        title: controller.titleController.text,
+        description: controller.descriptionController.text,
+        date: controller.selectedDate.value,
+        recurrence: controller.recurrenceTypeValue.value == "None"
+            ? null
+            : controller.recurrenceTypeValue.value);
     var result = await controller.addEvent(event);
     if (result) {
       controller.clearFields();
@@ -73,14 +75,34 @@ class AddEventScreen extends StatelessWidget {
                     controller.selectDate();
                   },
                 ),
-                DropdownButton(
-                    value: controller.recurrenceTypeValue,
-                    style:
-                        const TextStyle(color: AppColor.primary, fontSize: 18),
-                    onChanged: (value) {
-                      controller.recurrenceTypeValue.value = value;
-                    },
-                    items: dropdownItems),
+                Container(
+                  height: 48,
+                  alignment: Alignment.centerLeft,
+                  width: double.infinity,
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("Repeat"),
+                      Obx(() => DropdownButton(
+                          value: controller.recurrenceTypeValue.value,
+                          style: const TextStyle(
+                              color: AppColor.primary, fontSize: 18),
+                          onChanged: (value) {
+                            if (value != null) {
+                              controller.recurrenceTypeValue.value =
+                                  value.toString();
+                            }
+                          },
+                          items: dropdownItems)),
+                    ],
+                  ),
+                ),
                 CustomTextFormField(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   borderRadius: BorderRadius.circular(10),
@@ -118,6 +140,7 @@ class AddEventScreen extends StatelessWidget {
 
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
+      const DropdownMenuItem(value: "NONE", child: Text("None")),
       DropdownMenuItem(
           value: RecurranceType.daily.toString(), child: const Text("Daily")),
       DropdownMenuItem(
