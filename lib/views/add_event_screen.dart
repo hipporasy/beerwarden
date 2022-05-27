@@ -17,7 +17,7 @@ class AddEventScreen extends StatelessWidget {
         title: controller.titleController.text,
         description: controller.descriptionController.text,
         date: controller.selectedDate.value,
-        recurrence: controller.recurrenceTypeValue.value == "None"
+        recurrence: controller.recurrenceTypeValue.value == "NONE"
             ? null
             : controller.recurrenceTypeValue.value);
     var result = await controller.addEvent(event);
@@ -89,17 +89,19 @@ class AddEventScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text("Repeat"),
-                      Obx(() => DropdownButton(
-                          value: controller.recurrenceTypeValue.value,
-                          style: const TextStyle(
-                              color: AppColor.primary, fontSize: 18),
-                          onChanged: (value) {
-                            if (value != null) {
-                              controller.recurrenceTypeValue.value =
-                                  value.toString();
-                            }
-                          },
-                          items: dropdownItems)),
+                      Obx(
+                        () => DropdownButton(
+                            value: controller.recurrenceTypeValue.value,
+                            style: const TextStyle(
+                                color: AppColor.primary, fontSize: 18),
+                            onChanged: (value) {
+                              if (value != null) {
+                                controller.recurrenceTypeValue.value =
+                                    value.toString();
+                              }
+                            },
+                            items: dropdownItems),
+                      ),
                     ],
                   ),
                 ),

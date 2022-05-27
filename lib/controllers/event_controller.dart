@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/events.dart';
 import 'member_controller.dart';
-import 'package:timezone/data/latest.dart' as tz;
 
 class EventController extends GetxController {
   final _memberController = Get.put(MemberController());
@@ -130,6 +129,7 @@ class EventController extends GetxController {
     dateController.text = "";
     selectedDate = DateTime.now().obs;
     dateController.text = "";
+    recurrenceTypeValue.value == "NONE";
   }
 
   deleteEvent(Events event) async {
