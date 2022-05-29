@@ -14,6 +14,8 @@ class Member {
   DateTime dob;
   @HiveField(5)
   int beerCrate;
+  @HiveField(6)
+  int? birthdayHappened;
 
   Member({
     required this.id,
@@ -21,6 +23,7 @@ class Member {
     required this.lastName,
     required this.dob,
     required this.beerCrate,
+    this.birthdayHappened,
   });
 
   Member.fromJson(Map json)
@@ -28,7 +31,8 @@ class Member {
         firstName = json['firstName'],
         lastName = json['lastName'],
         dob = json['dob'],
-        beerCrate = json['beerCrate'];
+        beerCrate = json['beerCrate'],
+        birthdayHappened = json['birthdayHappened'];
 
   toJson() {
     return {
@@ -37,6 +41,7 @@ class Member {
       'lastName': lastName,
       'dob': dob,
       'beerCrate': beerCrate,
+      'birthdayHappened': birthdayHappened
     };
   }
 

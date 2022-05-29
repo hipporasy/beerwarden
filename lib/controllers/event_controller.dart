@@ -190,9 +190,12 @@ class EventController extends GetxController {
     if (e == null) {
       return;
     }
-    e.isConfirmed = true;
     e.occurrences = [e.date];
     updateEvent(e);
+  }
+
+  birthdayOccurIfNeeded() {
+    _memberController.addBeerIfNeeded();
   }
 
   recurrenceIfNeeded() async {
@@ -239,5 +242,10 @@ class EventController extends GetxController {
 extension DateOnlyCompare on DateTime {
   bool isSameDate(DateTime other) {
     return year == other.year && month == other.month && day == other.day;
+  }
+
+  bool isBirthday() {
+    var other = DateTime.now();
+    return month == other.month && day == other.day;
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:beerwarden/controllers/event_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -88,6 +89,7 @@ class MemberController extends GetxController {
 
     var tds = box.get('members');
     if (tds != null) members.value = tds;
+    addBeerIfNeeded();
   }
 
   clearMembers() {
@@ -110,6 +112,18 @@ class MemberController extends GetxController {
     members.remove(getMemberById(memberId));
     var box = await Hive.openBox('db');
     box.put('members', members.toList());
+  }
+
+  addBeerIfNeeded() async {
+    for (Member member in members) {
+      if (member.dob.isBirthday()) {
+        if (member.birthdayHappened == null || member.birthdayHappened != DateTime.now().year) {
+          member.beerCrate += 1;
+          member.birthdayHappened = DateTime.now().year;
+          await updateMember(member);
+        }
+      }
+    }
   }
 
   String? getRandomMemberId() {

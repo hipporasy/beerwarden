@@ -33,6 +33,7 @@ class AlarmScheduler {
 
   onAlarm() async {
     try {
+      await eventController.birthdayOccurIfNeeded();
       await eventController.getEvents();
       await eventController.occurrenceIfNeeded();
       await eventController.recurrenceIfNeeded();

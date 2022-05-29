@@ -22,13 +22,14 @@ class MemberAdapter extends TypeAdapter<Member> {
       lastName: fields[3] as String,
       dob: fields[4] as DateTime,
       beerCrate: fields[5] as int,
+      birthdayHappened: fields[6] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Member obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(1)
       ..write(obj.id)
       ..writeByte(2)
@@ -38,7 +39,9 @@ class MemberAdapter extends TypeAdapter<Member> {
       ..writeByte(4)
       ..write(obj.dob)
       ..writeByte(5)
-      ..write(obj.beerCrate);
+      ..write(obj.beerCrate)
+      ..writeByte(6)
+      ..write(obj.birthdayHappened);
   }
 
   @override
