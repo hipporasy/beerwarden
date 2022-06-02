@@ -5,7 +5,6 @@ import 'package:beerwarden/consts/app_color.dart';
 import 'package:beerwarden/views/member_list_screen.dart';
 import 'package:beerwarden/views/upcoming_event_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -75,9 +74,4 @@ class BeerWardenAppState extends State<BeerWardenApp> {
     });
   }
 
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
-  }
 }

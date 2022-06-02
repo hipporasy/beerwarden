@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:beerwarden/common/notification_service.dart';
 import 'package:flutter/material.dart';
@@ -37,17 +38,17 @@ class EventController extends GetxController {
       print(e);
     }
     await getEvents();
-    var box = await Hive.openBox('db');
-    DateTime? lastUpdated = box.get("lastUpdated");
-    if (lastUpdated == null) {
-      await box.put("lastUpdated", DateTime.now());
-      await regenerateAllWinners();
-    } else {
-      if (!lastUpdated.isSameDate(DateTime.now())) {
-        await box.put("lastUpdated", DateTime.now());
-        await regenerateAllWinners();
-      }
-    }
+    // var box = await Hive.openBox('db');
+    // DateTime? lastUpdated = box.get("lastUpdated");
+    // if (lastUpdated == null) {
+    //   await box.put("lastUpdated", DateTime.now().add(const Duration(days: 2)));
+    //   await regenerateAllWinners();
+    // } else {
+    //   if (!lastUpdated.isSameDate(DateTime.now())) {
+    //     await box.put("lastUpdated", DateTime.now().add(const Duration(days: 2)));
+    //     await regenerateAllWinners();
+    //   }
+    // }
     super.onInit();
   }
 
@@ -90,7 +91,7 @@ class EventController extends GetxController {
       events.value = [...values];
       upcomingEvents.value =
           allEvents.where((element) => !element.isConfirmed).toList();
-      upcomingEvents.sort((a, b) => b.date.compareTo(a.date));
+      upcomingEvents.sort((a, b) => a.date.compareTo(b.date));
       var result = values.firstWhereOrNull(
           (element) => (element.date.isSameDate(DateTime.now())));
       if (result != null) {
@@ -137,29 +138,29 @@ class EventController extends GetxController {
     var box = await Hive.openBox('db');
     box.put('events', events.toList());
     await getEvents();
-    NotificationService().flutterLocalNotificationsPlugin.cancelAll();
-    for (Events element in upcomingEvents) {
-      NotificationService().showNotification((upcomingEvents.length - 1),
-          "The winner has been chosen", element.title, element.date);
-    }
+    // NotificationService().flutterLocalNotificationsPlugin.cancelAll();
+    // for (Events element in upcomingEvents) {
+    //   NotificationService().showNotification((upcomingEvents.length - 1),
+    //       "The winner has been chosen", element.title, element.date);
+    // }
   }
 
-  regenerateAllWinners() async {
-    if (Platform.isIOS) {
-      await occurrenceIfNeeded();
-      await recurrenceIfNeeded();
-    }
-    for (Events element in events) {
-      if (element.isConfirmed) {
-        continue;
-      }
-      element.winnerId = _memberController.getRandomMemberId();
-    }
-    var box = await Hive.openBox('db');
-    box.put('events', events.toList());
-    getEvents();
-    return true;
-  }
+  // regenerateAllWinners() async {
+  //   if (Platform.isIOS) {
+  //     await occurrenceIfNeeded();
+  //     await recurrenceIfNeeded();
+  //   }
+  //   for (Events element in events) {
+  //     if (element.isConfirmed) {
+  //       continue;
+  //     }
+  //     element.winnerId = _memberController.getRandomMemberId();
+  //   }
+  //   var box = await Hive.openBox('db');
+  //   box.put('events', events.toList());
+  //   getEvents();
+  //   return true;
+  // }
 
   regenerateWinner() {
     if (happeningEvent.value != null) {
@@ -196,6 +197,23 @@ class EventController extends GetxController {
 
   birthdayOccurIfNeeded() {
     _memberController.addBeerIfNeeded();
+  }
+
+  pushNotificationIfNeeded() async {
+    for (Events element in events) {
+      if (element.isConfirmed) {
+        continue;
+      }
+      if (element.date.isTomorrow()) {
+        element.winnerId = _memberController.getRandomMemberId();
+        updateEvent(element);
+
+        NotificationService().showNowNotification(
+            Random().nextInt(99),
+            "The winner has been chosen for name: ${_memberController.getMemberById(element.winnerId!).displayName}",
+            element.title);
+      }
+    }
   }
 
   recurrenceIfNeeded() async {
@@ -246,6 +264,11 @@ extension DateOnlyCompare on DateTime {
 
   bool isBirthday() {
     var other = DateTime.now();
+    return month == other.month && day == other.day;
+  }
+
+  bool isTomorrow() {
+    var other = DateTime.now().add(const Duration(days: 1));
     return month == other.month && day == other.day;
   }
 }

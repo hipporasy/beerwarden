@@ -39,8 +39,38 @@ class NotificationService {
       int id, String title, String body, DateTime scheduleDate) async {
     var date = tz.TZDateTime.from(
         DateTime(
-            scheduleDate.year, scheduleDate.month, scheduleDate.day - 1, 8, 30),
+            scheduleDate.year, scheduleDate.month, scheduleDate.day - 1, 0, 0),
         tz.local);
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      id,
+      title,
+      body,
+      date,
+      const NotificationDetails(
+        // Android details
+        android: AndroidNotificationDetails('main_channel', 'Main Channel',
+            channelDescription: "Events",
+            importance: Importance.max,
+            priority: Priority.max),
+        // iOS details
+        iOS: IOSNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+
+      // Type of time interpretation
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      androidAllowWhileIdle:
+          true, // To show notification even when the app is closed
+    );
+  }
+
+  Future<void> showNowNotification(int id, String title, String body) async {
+    var date =
+        tz.TZDateTime.from(DateTime.now().add(const Duration(seconds: 5)), tz.local);
     await flutterLocalNotificationsPlugin.zonedSchedule(
       id,
       title,

@@ -1,6 +1,5 @@
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:beerwarden/controllers/event_controller.dart';
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AlarmScheduler {
@@ -37,6 +36,7 @@ class AlarmScheduler {
       await eventController.getEvents();
       await eventController.occurrenceIfNeeded();
       await eventController.recurrenceIfNeeded();
+      await eventController.pushNotificationIfNeeded();
     } catch (e) {
       print(e);
     }
