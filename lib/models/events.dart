@@ -27,6 +27,8 @@ class Events {
   String? recurrence;
   @HiveField(8)
   List<DateTime>? occurrences;
+  @HiveField(9)
+  bool manualGenerated;
 
   Events(
       {required this.id,
@@ -36,7 +38,8 @@ class Events {
       this.winnerId,
       this.isConfirmed = false,
       this.recurrence,
-      this.occurrences});
+      this.occurrences,
+      this.manualGenerated = false});
 
   Events.fromJson(Map json)
       : id = json['id'],
@@ -46,7 +49,8 @@ class Events {
         winnerId = json['winnerId'],
         isConfirmed = json['isConfirmed'],
         recurrence = json['recurrence'],
-        occurrences = json['occurrences'];
+        occurrences = json['occurrences'],
+        manualGenerated = json['manualGenerated'];
 
   toJson() {
     return {
@@ -58,6 +62,7 @@ class Events {
       'isConfirmed': isConfirmed,
       'recurrence': recurrence,
       'occurrences': occurrences,
+      'manualGenerated': manualGenerated
     };
   }
 }

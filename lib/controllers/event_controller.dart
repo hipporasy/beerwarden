@@ -38,17 +38,25 @@ class EventController extends GetxController {
       print(e);
     }
     await getEvents();
-    // var box = await Hive.openBox('db');
-    // DateTime? lastUpdated = box.get("lastUpdated");
-    // if (lastUpdated == null) {
-    //   await box.put("lastUpdated", DateTime.now().add(const Duration(days: 2)));
-    //   await regenerateAllWinners();
-    // } else {
-    //   if (!lastUpdated.isSameDate(DateTime.now())) {
-    //     await box.put("lastUpdated", DateTime.now().add(const Duration(days: 2)));
-    //     await regenerateAllWinners();
-    //   }
-    // }
+    var box = await Hive.openBox('db');
+    DateTime? lastUpdated = box.get("lastUpdated");
+    if (lastUpdated == null) {
+      await box.put("lastUpdated", DateTime.now());
+      await birthdayOccurIfNeeded();
+      await getEvents();
+      await occurrenceIfNeeded();
+      await recurrenceIfNeeded();
+      await regenerateAllWinners();
+    } else {
+      if (!lastUpdated.isSameDate(DateTime.now())) {
+        await box.put("lastUpdated", DateTime.now());
+        await birthdayOccurIfNeeded();
+        await getEvents();
+        await occurrenceIfNeeded();
+        await recurrenceIfNeeded();
+        await regenerateAllWinners();
+      }
+    }
     super.onInit();
   }
 
@@ -71,9 +79,18 @@ class EventController extends GetxController {
     events.add(event);
     var box = await Hive.openBox('db');
     box.put('events', events.toList());
-
-    NotificationService().showNotification((events.length - 1),
-        "The winner has been chosen", event.title, event.date);
+    if (event.date.isSameDate(DateTime.now())) {
+      NotificationService().showNowNotification(
+          (events.length - 1),
+          "The winner has been chosen for name: ${_memberController.getMemberById(event.winnerId!).displayName}",
+          event.title);
+    } else {
+      NotificationService().showNotification(
+          (events.length - 1),
+          "The winner has been chosen for name: ${_memberController.getMemberById(event.winnerId!).displayName}",
+          event.title,
+          event.date);
+    }
     getEvents();
     return true;
   }
@@ -138,29 +155,24 @@ class EventController extends GetxController {
     var box = await Hive.openBox('db');
     box.put('events', events.toList());
     await getEvents();
-    // NotificationService().flutterLocalNotificationsPlugin.cancelAll();
-    // for (Events element in upcomingEvents) {
-    //   NotificationService().showNotification((upcomingEvents.length - 1),
-    //       "The winner has been chosen", element.title, element.date);
-    // }
+    requeueAllNotification();
   }
 
-  // regenerateAllWinners() async {
-  //   if (Platform.isIOS) {
-  //     await occurrenceIfNeeded();
-  //     await recurrenceIfNeeded();
-  //   }
-  //   for (Events element in events) {
-  //     if (element.isConfirmed) {
-  //       continue;
-  //     }
-  //     element.winnerId = _memberController.getRandomMemberId();
-  //   }
-  //   var box = await Hive.openBox('db');
-  //   box.put('events', events.toList());
-  //   getEvents();
-  //   return true;
-  // }
+  regenerateAllWinners() async {
+    for (Events element in events) {
+      if (element.isConfirmed ||
+          element.manualGenerated ||
+          element.date.isAboutToHappen()) {
+        continue;
+      }
+      element.winnerId = _memberController.getRandomMemberId();
+    }
+    var box = await Hive.openBox('db');
+    box.put('events', events.toList());
+    getEvents();
+    requeueAllNotification();
+    return true;
+  }
 
   regenerateWinner() {
     if (happeningEvent.value != null) {
@@ -171,6 +183,30 @@ class EventController extends GetxController {
       generateWinnerName();
       getEvents();
     }
+  }
+
+  Events getEventById(String id) {
+    return events.firstWhere((element) => element.id == id);
+  }
+
+  String getWinnerName(Events events) {
+    return _memberController.getMemberById(events.winnerId!).displayName;
+  }
+
+  regenerateWinnerForEvent(Events current) {
+    current.winnerId = _memberController.getRandomMemberId();
+    current.manualGenerated = true;
+    var index = events.indexWhere((element) => current.id == element.id);
+    NotificationService().flutterLocalNotificationsPlugin.cancel(index);
+    if (!current.date.isSameDate(DateTime.now()) &&
+        !current.date.isTomorrow()) {
+      NotificationService().showNotification(
+          index,
+          "The winner has been chosen for name: ${_memberController.getMemberById(current.winnerId!).displayName}",
+          current.title,
+          current.date);
+    }
+    updateEvent(current);
   }
 
   generateWinnerName() {
@@ -197,23 +233,6 @@ class EventController extends GetxController {
 
   birthdayOccurIfNeeded() {
     _memberController.addBeerIfNeeded();
-  }
-
-  pushNotificationIfNeeded() async {
-    for (Events element in events) {
-      if (element.isConfirmed) {
-        continue;
-      }
-      if (element.date.isTomorrow()) {
-        element.winnerId = _memberController.getRandomMemberId();
-        updateEvent(element);
-
-        NotificationService().showNowNotification(
-            Random().nextInt(99),
-            "The winner has been chosen for name: ${_memberController.getMemberById(element.winnerId!).displayName}",
-            element.title);
-      }
-    }
   }
 
   recurrenceIfNeeded() async {
@@ -249,10 +268,19 @@ class EventController extends GetxController {
     var box = await Hive.openBox('db');
     box.put('events', events.toList());
     await getEvents();
+  }
+
+  requeueAllNotification() {
     NotificationService().flutterLocalNotificationsPlugin.cancelAll();
     for (Events element in upcomingEvents) {
-      NotificationService().showNotification((upcomingEvents.length - 1),
-          "The winner has been chosen", element.title, element.date);
+      if (element.date.isTomorrow()) {
+        continue;
+      }
+      NotificationService().showNotification(
+          (events.length - 1),
+          "The winner has been chosen for name: ${_memberController.getMemberById(element.winnerId!).displayName}",
+          element.title,
+          element.date);
     }
   }
 }
@@ -270,5 +298,11 @@ extension DateOnlyCompare on DateTime {
   bool isTomorrow() {
     var other = DateTime.now().add(const Duration(days: 1));
     return month == other.month && day == other.day;
+  }
+
+  bool isAboutToHappen() {
+    return isTomorrow() ||
+        isSameDate(DateTime.now()) ||
+        isSameDate(DateTime.now().add(const Duration(days: 2)));
   }
 }

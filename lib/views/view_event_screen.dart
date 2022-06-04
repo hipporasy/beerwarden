@@ -1,3 +1,4 @@
+import 'package:beerwarden/consts/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -125,6 +126,27 @@ class ViewEventScreen extends StatelessWidget {
             ),
             margin: const EdgeInsets.symmetric(horizontal: 20),
             child: _buildDetail(),
+          ),
+          const SizedBox(height: 20),
+          Obx(() {
+            var myEvent = controller.getEventById(event.id);
+            if (myEvent.manualGenerated) {
+              return Text(
+                controller.getWinnerName(myEvent),
+                style: const TextStyle(color: AppColor.primary, fontSize: 18),
+              );
+            }
+            return const SizedBox();
+          }),
+          OutlinedButton(
+            onPressed: () {
+              controller.regenerateWinnerForEvent(event);
+            },
+            style: OutlinedButton.styleFrom(primary: AppColor.primary),
+            child: const Text(
+              'Generate Winner',
+              style: TextStyle(color: AppColor.primary, fontSize: 18),
+            ),
           ),
           const SizedBox(height: 20),
           CustomButton(
