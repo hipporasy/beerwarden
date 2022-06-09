@@ -138,16 +138,22 @@ class ViewEventScreen extends StatelessWidget {
             }
             return const SizedBox();
           }),
-          OutlinedButton(
-            onPressed: () {
-              controller.regenerateWinnerForEvent(event);
-            },
-            style: OutlinedButton.styleFrom(primary: AppColor.primary),
-            child: const Text(
-              'Generate Winner',
-              style: TextStyle(color: AppColor.primary, fontSize: 18),
-            ),
-          ),
+          Obx(() {
+            var myEvent = controller.getEventById(event.id);
+            if (!myEvent.isConfirmed) {
+              return OutlinedButton(
+                onPressed: () {
+                  controller.regenerateWinnerForEvent(event);
+                },
+                style: OutlinedButton.styleFrom(primary: AppColor.primary),
+                child: const Text(
+                  'Generate Winner',
+                  style: TextStyle(color: AppColor.primary, fontSize: 18),
+                ),
+              );
+            }
+            return const SizedBox();
+          }),
           const SizedBox(height: 20),
           CustomButton(
             title: "Delete",

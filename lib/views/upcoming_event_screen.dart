@@ -151,9 +151,9 @@ class UpcomingEventScreen extends StatelessWidget {
         const SizedBox(
           height: 12,
         ),
-        const Text(
-          "No Event Today",
-          style: TextStyle(
+        Text(
+          controller.hasMember() ? "No Event Today" : "No crates left",
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -235,7 +235,7 @@ class UpcomingEventScreen extends StatelessWidget {
     showDialog(
         context: context,
         builder: (context) => const AlertDialog(
-              content: Text("Please add member first!"),
+              content: Text("Either Member or Beer Crate is Empty"),
             ));
   }
 }

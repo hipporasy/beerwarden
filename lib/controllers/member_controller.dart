@@ -134,6 +134,9 @@ class MemberController extends GetxController {
       var crateNumber = element.beerCrate > number
           ? element.beerCrate - number
           : element.beerCrate;
+      if (element.beerCrate == 0) {
+        continue;
+      }
       var duplicatedIds =
           Iterable.generate(crateNumber).toList().map((e) => element.id);
       ids.addAll(duplicatedIds);

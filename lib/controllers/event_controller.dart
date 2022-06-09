@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:beerwarden/common/notification_service.dart';
+import 'package:beerwarden/models/member.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -151,6 +152,9 @@ class EventController extends GetxController {
   }
 
   deleteEvent(Events event) async {
+    if (event == happeningEvent.value) {
+      isConfirm.value = false;
+    }
     events.remove(event);
     var box = await Hive.openBox('db');
     box.put('events', events.toList());
@@ -219,7 +223,14 @@ class EventController extends GetxController {
   }
 
   bool hasMember() {
-    return _memberController.members.value.isNotEmpty;
+    if (_memberController.members.value.isEmpty) {
+      return false;
+    }
+    int crateCount = 0;
+    for (Member member in _memberController.members.value) {
+      crateCount += member.beerCrate;
+    }
+    return crateCount > 0;
   }
 
   occurrenceIfNeeded() async {
