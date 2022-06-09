@@ -141,6 +141,9 @@ class MemberController extends GetxController {
           Iterable.generate(crateNumber).toList().map((e) => element.id);
       ids.addAll(duplicatedIds);
     }
+    if (ids.isEmpty) {
+      return null;
+    }
     ids.shuffle();
     final random = Random();
     var selectedId = ids[random.nextInt(ids.length)];

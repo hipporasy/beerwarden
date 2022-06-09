@@ -112,7 +112,7 @@ class EventController extends GetxController {
       upcomingEvents.sort((a, b) => a.date.compareTo(b.date));
       var result = values.firstWhereOrNull(
           (element) => (element.date.isSameDate(DateTime.now())));
-      if (result != null) {
+      if (result != null && hasMember()) {
         happeningEvent.value = result;
         generateWinnerName();
         upcomingEvents.remove(result);
